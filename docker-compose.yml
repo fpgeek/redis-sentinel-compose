@@ -1,0 +1,22 @@
+version: '2'
+services:
+  redismaster:
+    network_mode: host
+    image: redis
+
+  redisslave:
+    network_mode: host
+    image: redis
+    command: redis-server --port 6380 --slaveof 192.168.99.100 6379
+    depends_on:
+      - redismaster
+
+  redissentinel:
+    network_mode: host
+    image: redis
+    command: redis-sentinel /etc/redis/sentinel.conf
+    volumes:
+      - ./sentinel.conf:/etc/redis/sentinel.conf
+    depends_on:
+      - redismaster
+      - redisslave
